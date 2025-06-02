@@ -1,23 +1,21 @@
-from flask import Flask, request, render_template
-from datetime import datetime
 import os
+from flask import Flask, request
+from datetime import datetime
 
 app = Flask(__name__)
 
 @app.route('/')
-def index():
+def log_ip():
     ip = request.remote_addr
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    log_entry = f"{timestamp} - IP: {ip}\n"
+    print(f"{timestamp} - IP: {ip}")
 
-    # Ensure logs.txt exists before writing
-    if not os.path.exists("logs.txt"):
-        open("logs.txt", "w").close()
-
+    # Optional: write to file (not persistent on Render)
     with open("logs.txt", "a") as f:
-        f.write(log_entry)
+        f.write(f"{timestamp} - IP: {ip}\n")
 
-    return render_template("index.html")
+    return "Your IP has been logged."
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))  # Use PORT from Render
+    app.run(host="0.0.0.0", port=port)
